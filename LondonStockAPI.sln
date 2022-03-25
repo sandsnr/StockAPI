@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LondonStock.Service.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LondonStock.API.Tests", "LondonStock.API.Tests\LondonStock.API.Tests.csproj", "{019B7093-452A-4568-861E-06D44734D0D0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LondonStock.Database", "LondonStock.Database", "{C1332EA1-EECD-4F1E-88E2-9755E9C7AB17}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LondonStock.Database", "LondonStock.Database", "{9165BDC1-D96C-41E9-B13F-36433025A56F}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\Users\sdkft\OneDrive\Documents\LondonStock.Database.sql = ..\..\..\Users\sdkft\OneDrive\Documents\LondonStock.Database.sql
+		LondonStock.Database.sql = LondonStock.Database.sql
 	EndProjectSection
 EndProject
 Global

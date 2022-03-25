@@ -1,0 +1,211 @@
+﻿USE [master]
+GO
+/****** Object:  Database [LondonStock]    Script Date: 25/03/2022 01:03:28 ******/
+CREATE DATABASE [LondonStock]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'LondonStock', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\DATA\LondonStock.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'LondonStock_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\DATA\LondonStock_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+GO
+ALTER DATABASE [LondonStock] SET COMPATIBILITY_LEVEL = 140
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [LondonStock].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [LondonStock] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [LondonStock] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [LondonStock] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [LondonStock] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [LondonStock] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [LondonStock] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [LondonStock] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [LondonStock] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [LondonStock] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [LondonStock] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [LondonStock] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [LondonStock] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [LondonStock] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [LondonStock] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [LondonStock] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [LondonStock] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [LondonStock] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [LondonStock] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [LondonStock] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [LondonStock] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [LondonStock] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [LondonStock] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [LondonStock] SET RECOVERY FULL 
+GO
+ALTER DATABASE [LondonStock] SET  MULTI_USER 
+GO
+ALTER DATABASE [LondonStock] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [LondonStock] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [LondonStock] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [LondonStock] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [LondonStock] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [LondonStock] SET QUERY_STORE = OFF
+GO
+USE [LondonStock]
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET IDENTITY_CACHE = ON;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET LEGACY_CARDINALITY_ESTIMATION = OFF;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET LEGACY_CARDINALITY_ESTIMATION = PRIMARY;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = 0;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET MAXDOP = PRIMARY;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET PARAMETER_SNIFFING = ON;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET PARAMETER_SNIFFING = PRIMARY;
+GO
+ALTER DATABASE SCOPED CONFIGURATION SET QUERY_OPTIMIZER_HOTFIXES = OFF;
+GO
+ALTER DATABASE SCOPED CONFIGURATION FOR SECONDARY SET QUERY_OPTIMIZER_HOTFIXES = PRIMARY;
+GO
+USE [LondonStock]
+GO
+/****** Object:  User [localdev]    Script Date: 25/03/2022 01:03:28 ******/
+CREATE USER [localdev] FOR LOGIN [localdev] WITH DEFAULT_SCHEMA=[dbo]
+GO
+ALTER ROLE [db_owner] ADD MEMBER [localdev]
+GO
+/****** Object:  Table [dbo].[ExchangeTransactions]    Script Date: 25/03/2022 01:03:28 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ExchangeTransactions](
+	[Id] [bigint] IDENTITY(1,1) NOT NULL,
+	[BrokerId] [uniqueidentifier] NOT NULL,
+	[TickerSymbol] [nvarchar](50) NOT NULL,
+	[Price] [money] NOT NULL,
+	[NumberOfShares] [float] NOT NULL,
+ CONSTRAINT [PK_ExchangeTransactions] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  StoredProcedure [dbo].[GetStockValue_ByTickerSymbol]    Script Date: 25/03/2022 01:03:30 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetStockValue_ByTickerSymbol]
+	@TickerSymbol nvarchar(50)
+AS
+BEGIN
+
+	SELECT TOP 1 [Id]
+		  ,[BrokerId]
+		  ,[TickerSymbol]
+		  ,[Price]
+		  ,[NumberOfShares]
+	  FROM [dbo].[ExchangeTransactions]
+	  WHERE [TickerSymbol] = @TickerSymbol
+	  ORDER BY Id DESC 
+
+
+  END
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[GetStockValue_ByTickerSymbolRange]    Script Date: 25/03/2022 01:03:30 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetStockValue_ByTickerSymbolRange]
+	@TickerSymbols nvarchar(1000)
+AS
+BEGIN
+
+DECLARE @XML XML
+SET @XML = CAST('<i>' + REPLACE(@TickerSymbols, ',', '</i><i>') + '</i>' AS XML)
+
+
+SELECT  prices.[Id]
+		  ,prices.[BrokerId]
+		  ,prices.[TickerSymbol]
+		  ,prices.[Price]
+		  ,prices.[NumberOfShares]
+FROM  [dbo].[ExchangeTransactions] AS prices
+INNER JOIN (
+            SELECT MAX(Id) AS Id
+	  FROM [dbo].[ExchangeTransactions] AS prices	  
+    INNER JOIN @XML.nodes('i') x(i) 
+        ON  prices.TickerSymbol = x.i.value('.', 'VARCHAR(MAX)')
+	  GROUP BY [TickerSymbol]
+	  ) t1 ON t1.Id = prices.Id
+
+
+  END
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[Insert_ExchangeTransaction]    Script Date: 25/03/2022 01:03:30 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[Insert_ExchangeTransaction]
+
+	@BrokerId uniqueidentifier
+	,@TickerSymbol nvarchar(50)
+	,@Price money
+	,@NumberOfShares float
+
+AS
+BEGIN
+
+INSERT INTO [dbo].[ExchangeTransactions]
+           ([BrokerId]
+           ,[TickerSymbol]
+           ,[Price]
+           ,[NumberOfShares])
+     VALUES
+           (@BrokerId
+           ,@TickerSymbol
+           ,@Price
+           ,@NumberOfShares)
+END
+
+
+GO
+USE [master]
+GO
+ALTER DATABASE [LondonStock] SET  READ_WRITE 
+GO
