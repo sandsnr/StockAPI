@@ -42,7 +42,7 @@ namespace LondonStock.API
 
             if (results == null)
             {
-                return new NotFoundObjectResult("no prices found for symbol");
+                return new NotFoundObjectResult("no prices found for ticker symbols");
             }
 
             return new OkObjectResult(results);
