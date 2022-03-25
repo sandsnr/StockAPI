@@ -1,0 +1,12 @@
+LondonStock.API.Tests/bin/
+LondonStock.API.Tests/obj/
+LondonStockAPI.DataAccess.Dapper/bin/
+LondonStockAPI.DataAccess.Dapper/obj/LondonStock.DataAccess.Dapper.csproj.nuget.dgspec.json
+LondonStockAPI.DataAccess.Dapper/obj/LondonStock.DataAccess.Dapper.csproj.nuget.g.props
+LondonStockAPI.DataAccess.Dapper/obj/
+LondonStockAPI.Models/obj/
+LondonStockAPI.Service.Tests/bin/
+LondonStockAPI.Service.Tests/obj/
+LondonStockApi.Service/bin/
+LondonStockApi.Service/obj/
+.vs/

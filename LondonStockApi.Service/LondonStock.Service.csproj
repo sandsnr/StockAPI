@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LondonStockAPI.DataAccess.Dapper\LondonStock.DataAccess.Dapper.csproj" />
+    <ProjectReference Include="..\LondonStockAPI.Models\LondonStock.Models.csproj" />
+  </ItemGroup>
+
+</Project>
